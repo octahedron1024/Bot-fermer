@@ -9,7 +9,7 @@ const seeds = ['potato', 'wheat_seeds', 'carrot'].map(seed => data.itemsByName[s
 const point = new Vec3(-6, 4, 8);
 const maxDistance = 32;
 const count = 100;
-const emptySlotCount = 30;
+const emptySlotCount = 34;
 var storage = [new Vec3(-13, 4, 8)];
 
 const bot = mineflayer.createBot({
@@ -89,7 +89,8 @@ async function storageLogic(){
                     await ches.deposit(item.type, null, item.count);
                 }
             } catch (error) {
-                return;
+                ches.close();
+                continue;
             }
             ches.close();
         };
