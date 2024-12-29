@@ -9,8 +9,9 @@ const seeds = ['potato', 'wheat_seeds', 'carrot'].map(seed => data.itemsByName[s
 const point = new Vec3(-6, 4, 8);
 const maxDistance = 32;
 const count = 100;
-const emptySlotCount = 34;
+const emptySlotCount = 9;
 var storage = [new Vec3(-13, 4, 8)];
+var errsCrops = [];
 
 const bot = mineflayer.createBot({
     username: "bot",
@@ -21,6 +22,8 @@ const bot = mineflayer.createBot({
 
 function blockCrops(){
     var cropPositions = [];
+    cropPositions.push(...errsCrops);
+    errsCrops = [];
     for (var id of findingCrops){
         cropPositions.push(...bot.findBlocks({
             matching: id,
@@ -58,10 +61,13 @@ async function digPlace(positions) {
                 if (bot.inventory.count(seeds[i]) == 0){
                     await bot.waitForTicks(30);
                 }
-                await bot.equip(seeds[i], 'hand');
-                const farmland = bot.blockAt(position.offset(0, -1, 0));
-                await bot.placeBlock(farmland, new Vec3(0, 1, 0));
-                break;
+                try {
+                    await bot.equip(seeds[i], 'hand');
+                    await bot.placeBlock(bot.blockAt(position.offset(0, -1, 0)), new Vec3(0, 1, 0));
+                    break;
+                } catch (error) {
+                    errsCrops.push(position);
+                };
             };
             i++;
         };
